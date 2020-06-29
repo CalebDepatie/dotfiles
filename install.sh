@@ -11,7 +11,7 @@ fi
 if [[ "$OSTYPE" == 'linux-gnu' ]]; then
   INSTALLER=apt
 else
-  echo "Undefined OS. Please update installer."
+  echo "Undefined OS. Please update install.sh"
 fi
 
 # Initial setup commands to ensure everything will work
