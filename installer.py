@@ -6,16 +6,18 @@ import os
 import sys
 import subprocess
 
+# TODO: Clean up the code
+
 # Config variable setup
 config = {}
 config['size'] = os.get_terminal_size()
 config['home_path'] = '~/'
-config['packages'] = ['atom', 'kitty']
+config['packages'] = ['atom', 'kitty', 'zsh']
 config['devtools'] = ['meson', 'llvm']
 config['font'] = 'https://download.jetbrains.com/fonts/JetBrainsMono-1.0.3.zip?_ga=2.59111342.2034427416.1593382366-1719389182.1592084656'
 uname = os.uname()
 if "Ubuntu" in uname[3]:
-    config['install'] = 'apt'
+    config['install'] = 'apt install'
     config['download'] = 'wget'
 else:
     print("Undefined OS. Please update installer.py")
@@ -58,21 +60,50 @@ def install():
     total_items_to_install = len(config['packages']) + len(config['devtools']) + 1 + 4 # Font(1) + dotfiles(4)
     total_items_installed = 0 # TODO: Progress bar
     # Install base packages
+    for package in config['packages']:
+        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
 
+    # I just like this look, TODO: should have the [] be useful
+    # TODO: Move into a function
+    screen.addstr(4, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
+    screen.addstr(4, 8, "Packages Installed", curses.color_pair(2))
+    screen.refresh()
     # Font install
     subprocess.run(['wget -q --output-document=font.zip ' + config['font']], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
     subprocess.run(['unzip -o font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv JetBrainsMono-1.0.3 /usr/share/fonts'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    subprocess.run(['mv -u JetBrainsMono-1.0.3 /usr/share/fonts/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
     subprocess.run(['fc-cache -f -v'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-
     subprocess.run(['rm font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
 
+    screen.addstr(5, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
+    screen.addstr(5, 8, "Font Installed", curses.color_pair(2))
+    screen.refresh()
+
+    # TODO: Add Oh-My-Zsh installation
+
     # Move config files to proper places
+    subprocess.run(['mv -u configs/.bashrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    subprocess.run(['mv -u configs/.zshrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    subprocess.run(['mv -u configs/kitty.conf ~/.config/kitty/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    subprocess.run(['mv -u configs/atom/config.cson ~/.atom/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    subprocess.run(['mv -u configs/atom/accentsui-modified-ui ~/.atom/packages'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+
+    screen.addstr(6, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
+    screen.addstr(6, 8, "Dotfiles Installed", curses.color_pair(2))
+    screen.refresh()
 
     # Install full dev environment
+    # TODO: Install atom packages
+    for package in config['devtools']:
+        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+
+    screen.addstr(7, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
+    screen.addstr(7, 8, "Dev Tools Installed", curses.color_pair(2))
+    screen.refresh()
     c = screen.getch()
 
 # Enum for handling the different options to make it easy to add more
+# TODO: Finish the custom install
 from enum import IntEnum
 class options(IntEnum):
     INSTALL = 1
