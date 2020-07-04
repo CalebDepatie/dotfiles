@@ -30,6 +30,9 @@ def quit_curses():
     curses.echo()
     curses.endwin()
     curses.curs_set(1)
+def run_bash(cmd):
+    # Add error handling ?
+    subprocess.run(cmd, shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
 def centre_string(string, x):
     screen.addstr(x, int((config['size'][0]/2)-(len(string)/2)), string)
 def centre_styled_string(string, x, args):
@@ -72,16 +75,16 @@ def install():
     total_items_installed = 0 # TODO: Progress bar
     # Install base packages
     for package in config['packages']:
-        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+        run_bash([config['install'] + ' ' + package])
 
     install_output("Packages Installed", y++, True)
 
     # Font install
-    subprocess.run(['wget -q --output-document=font.zip ' + config['font']], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['unzip -o font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u JetBrainsMono-1.0.3 /usr/share/fonts/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['fc-cache -f -v'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['rm font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    run_bash(['wget -q --output-document=font.zip ' + config['font']])
+    run_bash(['unzip -o font.zip'])
+    run_bash(['mv -u JetBrainsMono-1.0.3 /usr/share/fonts/'])
+    run_bash(['fc-cache -f -v'])
+    run_bash(['rm font.zip'])
 
     install_output("Font Installed", y++, True)
 
@@ -89,18 +92,18 @@ def install():
 
     # Move config files to proper places
     # TODO: Change this to sym linking
-    subprocess.run(['mv -u configs/.bashrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/.zshrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/kitty.conf ~/.config/kitty/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/atom/config.cson ~/.atom/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/atom/accentsui-modified-ui ~/.atom/packages'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    run_bash(['mv -u configs/.bashrc ~/'])
+    run_bash(['mv -u configs/.zshrc ~/'])
+    run_bash(['mv -u configs/kitty.conf ~/.config/kitty/'])
+    run_bash(['mv -u configs/atom/config.cson ~/.atom/'])
+    run_bash(['mv -u configs/atom/accentsui-modified-ui ~/.atom/packages'])
 
     install_output("Dotfiles Installed", y++, True)
 
     # Install full dev environment
     # TODO: Install atom packages
     for package in config['devtools']:
-        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+        run_bash([config['install'] + ' ' + package])
 
     install_output("Dev Tools Intalled", y++, True)
 
