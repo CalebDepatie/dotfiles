@@ -97,3 +97,24 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# LD libs ; doesnt work, will have to fix
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib/llvm-10/lib
+
+# aliases
+alias gotodots="cd ~/Documents/dotfiles"
+alias gotovelox="cd ~/../../media/thehowlinggreywolf/sharedspace/Velox\ Engine"
+alias gototicks="cd ~/../../media/thehowlinggreywolf/sharedspace/tickscompiler"
+alias gotobf="cd ~/../../media/thehowlinggreywolf/sharedspace/bf-comp"
+
+# Useful functions
+gitall() {
+  git add *
+  if [ -n "$1" ]
+  then
+    git commit -m "$1"
+  else
+    git commit -m "update"
+  fi
+  git push origin
+}
