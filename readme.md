@@ -6,7 +6,7 @@ The installer is written in Python and use Curses to provide a fairly simple int
 
 A granular custom installation is planned.
 
-To run simply use `sudo bash install.sh` in the home directory. This bash script will ensure the machine and it's packages is up to date before running the UI based installer.
+To run simply use `sudo bash install.sh` in the /dotfiles directory. This bash script will ensure the machine and it's packages is up to date before running the UI based installer.
 
 [todos]: https://www.tickgit.com/browse?repo=github.com/CalebDepatie/dotfiles
 [todos-badge]: https://badgen.net/https/api.tickgit.com/badgen/github.com/CalebDepatie/dotfiles

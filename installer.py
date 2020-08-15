@@ -30,6 +30,9 @@ def quit_curses():
     curses.echo()
     curses.endwin()
     curses.curs_set(1)
+def run_bash(cmd):
+    # Add error handling ?
+    subprocess.run(cmd, shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
 def centre_string(string, x):
     screen.addstr(x, int((config['size'][0]/2)-(len(string)/2)), string)
 def centre_styled_string(string, x, args):
@@ -39,6 +42,16 @@ def selected_option(cursor, index):
         return curses.color_pair(2)
     else:
         return curses.A_STANDOUT | curses.color_pair(3)
+# I just like this look, TODO: should have the [] be useful
+def install_output(message, y, ok):
+    if ok:
+        screen.addstr(y, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
+        x = 8
+    else:
+        screen.addstr(y, 1, "[ FAILED ]", curses.A_BOLD | curses.color_pair(1))
+        x = 12
+    screen.addstr(y, x, message, curses.color_pair(2))
+    screen.refresh()
 
 screen = curses.initscr()
 curses.start_color()
@@ -54,6 +67,7 @@ curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
 curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
 
 def install():
+    y = 3
     screen.clear()
     centre_styled_string("Dotfiles Installer", 1, curses.A_BOLD | curses.color_pair(1))
     screen.refresh()
@@ -61,45 +75,40 @@ def install():
     total_items_installed = 0 # TODO: Progress bar
     # Install base packages
     for package in config['packages']:
-        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+        run_bash([config['install'] + ' ' + package])
 
-    # I just like this look, TODO: should have the [] be useful
-    # TODO: Move into a function
-    screen.addstr(4, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
-    screen.addstr(4, 8, "Packages Installed", curses.color_pair(2))
-    screen.refresh()
+    install_output("Packages Installed", y++, True)
+
     # Font install
-    subprocess.run(['wget -q --output-document=font.zip ' + config['font']], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['unzip -o font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u JetBrainsMono-1.0.3 /usr/share/fonts/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['fc-cache -f -v'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['rm font.zip'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    run_bash(['wget -q --output-document=font.zip ' + config['font']])
+    run_bash(['unzip -o font.zip'])
+    run_bash(['mv -u JetBrainsMono-1.0.3 /usr/share/fonts/'])
+    run_bash(['fc-cache -f -v'])
+    run_bash(['rm font.zip'])
 
-    screen.addstr(5, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
-    screen.addstr(5, 8, "Font Installed", curses.color_pair(2))
-    screen.refresh()
+    install_output("Font Installed", y++, True)
 
     # TODO: Add Oh-My-Zsh installation
 
     # Move config files to proper places
-    subprocess.run(['mv -u configs/.bashrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/.zshrc ~/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/kitty.conf ~/.config/kitty/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/atom/config.cson ~/.atom/'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
-    subprocess.run(['mv -u configs/atom/accentsui-modified-ui ~/.atom/packages'], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+    # TODO: Change this to sym linking
+    run_bash(['mv -u configs/.bashrc ~/'])
+    run_bash(['mv -u configs/.zshrc ~/'])
+    run_bash(['mv -u configs/kitty.conf ~/.config/kitty/'])
+    run_bash(['mv -u configs/atom/config.cson ~/.atom/'])
+    run_bash(['mv -u configs/atom/accentsui-modified-ui ~/.atom/packages'])
 
-    screen.addstr(6, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
-    screen.addstr(6, 8, "Dotfiles Installed", curses.color_pair(2))
-    screen.refresh()
+    install_output("Dotfiles Installed", y++, True)
 
     # Install full dev environment
     # TODO: Install atom packages
     for package in config['devtools']:
-        subprocess.run([config['install'] + ' ' + package], shell=True, executable='/bin/bash', stdout=subprocess.DEVNULL)
+        run_bash([config['install'] + ' ' + package])
 
-    screen.addstr(7, 1, "[ OK ]", curses.A_BOLD | curses.color_pair(1))
-    screen.addstr(7, 8, "Dev Tools Installed", curses.color_pair(2))
-    screen.refresh()
+    install_output("Dev Tools Intalled", y++, True)
+
+    centre_styled_string("Press Any Button to Return", y++, curses.A_BOLD | curses.color_pair(1))
+
     c = screen.getch()
 
 # Enum for handling the different options to make it easy to add more
@@ -147,5 +156,5 @@ def main_page():
 
 main_page()
 
-# Exit the installer here incase something broke
+# Exit the installer here in case something broke
 quit_curses()
