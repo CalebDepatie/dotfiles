@@ -1,6 +1,6 @@
 [![TODOs][todos-badge]][todos]
 
-I've changed this repo a bit, this branch contains the dots for my EndeavourOS based build on my laptop, with the main branch still containing the dots for my desktop BedrockLinux based machine.
+I've changed this repo a bit, this branch contains the dots for my EndeavourOS based build on my laptop, with the main branch still containing the dots for my desktop BedrockLinux based machine. Uses Pantheon as the DE
 
 ---
 
